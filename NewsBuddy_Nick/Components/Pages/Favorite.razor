@@ -1,0 +1,58 @@
+﻿@page "/favorite"
+@using NewsAPI.Models
+@using System.Text.Json
+@inject IJSRuntime JS
+
+<h1>Favorite Articles</h1>
+
+@if (favorites == null)
+{
+    <p>Loading...</p>
+}
+else if (!favorites.Any())
+{
+    <p>No favorites yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var article in favorites)
+        {
+            <li>
+                <a href="#" @onclick="() => OpenArticle(article.Url)">
+                    <strong>@article.Title</strong>
+                </a>
+                <br />
+                <em>@article.Author</em><br />
+                @article.Description
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Article>? favorites;
+
+    protected override void OnInitialized()
+    {
+        LoadFavorites();
+    }
+
+    private void LoadFavorites()
+    {
+        string json = Preferences.Get("favorite_articles", "[]");
+        favorites = JsonSerializer.Deserialize<List<Article>>(json) ?? new();
+    }
+
+    private async Task OpenArticle(string url)
+    {
+        try
+        {
+            await Launcher.Default.OpenAsync(url);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not open URL: {ex.Message}");
+        }
+    }
+}

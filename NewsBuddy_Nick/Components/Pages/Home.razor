@@ -1,0 +1,32 @@
+﻿@page "/"
+@inherits NewsBuddy_Nick.Pages.Home
+
+<h1>Latest News</h1>
+
+@if (articles == null)
+{
+        <p>Loading news...</p>
+}
+else if (!articles.Any())
+{
+        <p>No news available.</p>
+}
+else
+{
+        <ul>
+        @foreach (var article in articles)
+        {
+            var id = $"article_{article.Title.GetHashCode()}";
+            <li id="@id">
+                <button @onclick="() => SaveFavorite(article)">⭐</button>
+
+                <a href="#" @onclick="() => OpenArticle(article.Url)">
+                    <strong>@article.Title</strong>
+                </a>
+                <br />
+                <em>@article.Author</em><br />
+                @article.Description
+            </li>
+        }
+        </ul>
+}
