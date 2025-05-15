@@ -17,9 +17,9 @@ public class NewsService
     {
         var request = new EverythingRequest
         {
-            Q = "Apple",
+            Q = "News",
             SortBy = SortBys.Popularity,
-            Language = Languages.EN,
+            Language = Languages.DA,
             From = DateTime.Today.AddDays(-7)
         };
 

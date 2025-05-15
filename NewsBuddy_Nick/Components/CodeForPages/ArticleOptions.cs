@@ -13,54 +13,56 @@ namespace NewsBuddy_Nick.Helpers
 
             if (action == "Favorite")
             {
-                await SaveFavoriteAsync(article);
+                await ToggleFavoriteAsync(article, refreshUI);
             }
             else if (action == "Delete")
             {
-                // Remove from both currentArticles and from Preferences
-                var itemToRemove = currentArticles.FirstOrDefault(a => a.Url == article.Url);
-                if (itemToRemove != null)
-                {
-                    currentArticles.Remove(itemToRemove);
-
-                    // 🔁 Update Preferences as well
-                    var storedJson = Preferences.Get("favorite_articles", "[]");
-                    var storedList = JsonSerializer.Deserialize<List<Article>>(storedJson) ?? new();
-                    var storedItem = storedList.FirstOrDefault(a => a.Url == article.Url);
-                    if (storedItem != null)
-                    {
-                        storedList.Remove(storedItem);
-                        Preferences.Set("favorite_articles", JsonSerializer.Serialize(storedList));
-                    }
-
-                    refreshUI(); // Refresh UI after modification
-                }
+                await DeleteArticleAsync(article, currentArticles, refreshUI);
             }
         }
 
-
-        public static async Task SaveFavoriteAsync(Article article)
+        public static async Task ToggleFavoriteAsync(Article article, Action? refreshUI = null)
         {
-            var json = Preferences.Get("favorite_articles", "[]");
-            var list = JsonSerializer.Deserialize<List<FavoriteArticle>>(json) ?? new();
+            string json = Preferences.Get("favorite_articles", "[]");
+            var list = JsonSerializer.Deserialize<List<Article>>(json) ?? new();
 
-            if (!list.Any(a => a.Url == article.Url))
+            var existing = list.FirstOrDefault(a => a.Url == article.Url);
+            if (existing != null)
             {
-                list.Add(new FavoriteArticle
-                {
-                    Title = article.Title,
-                    Author = article.Author,
-                    Description = article.Description,
-                    Url = article.Url
-                });
-
-                Preferences.Set("favorite_articles", JsonSerializer.Serialize(list));
-                await App.Current.Windows[0].Page.DisplayAlert("Saved", "Article added to favorites.", "OK");
+                list.Remove(existing);
+                await App.Current.Windows[0].Page.DisplayAlert("Removed", "Removed from favorites.", "OK");
             }
             else
             {
-                await App.Current.Windows[0].Page.DisplayAlert("Already Saved", "This article is already in your favorites.", "OK");
+                list.Add(article);
+                await App.Current.Windows[0].Page.DisplayAlert("Saved", "Added to favorites.", "OK");
             }
+
+            Preferences.Set("favorite_articles", JsonSerializer.Serialize(list));
+            refreshUI?.Invoke();
+        }
+
+        public static async Task DeleteArticleAsync(Article article, List<Article> currentArticles, Action refreshUI)
+        {
+            var itemToRemove = currentArticles.FirstOrDefault(a => a.Url == article.Url);
+            if (itemToRemove != null)
+            {
+                currentArticles.Remove(itemToRemove);
+            }
+
+            var json = Preferences.Get("favorite_articles", "[]");
+            var list = JsonSerializer.Deserialize<List<Article>>(json) ?? new();
+            list.RemoveAll(a => a.Url == article.Url);
+            Preferences.Set("favorite_articles", JsonSerializer.Serialize(list));
+
+            refreshUI();
+        }
+
+        public static bool IsFavorite(Article article)
+        {
+            var json = Preferences.Get("favorite_articles", "[]");
+            var list = JsonSerializer.Deserialize<List<Article>>(json) ?? new();
+            return list.Any(a => a.Url == article.Url);
         }
     }
 }

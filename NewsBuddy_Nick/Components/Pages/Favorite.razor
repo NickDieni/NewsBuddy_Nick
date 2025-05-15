@@ -5,7 +5,7 @@
 @inject IJSRuntime JS
 @inherits NewsBuddy_Nick.Pages.Favorite
 
-<h1>Favorite Articles</h1>
+<h1 style="padding: 0; margin: 0 auto; max-width: 600px; width: 100%;">Favorite Articles</h1>
 
 @if (favorites == null)
 {
@@ -17,22 +17,29 @@ else if (!favorites.Any())
 }
 else
 {
-    <ul>
-        @foreach (var article in favorites)
+    <ul style="  padding: 0; margin: 0 auto; max-width: 600px; width: 100%;">
+        @foreach (var article in articles)
         {
-            <li style="display: flex; align-items: center; margin-bottom: 12px; ">
-                <!-- Options button -->
-                <button @onclick="async () => await ShowOptions(article)">☰</button>
+            <li style="display: flex; align-items: center; margin-bottom: 12px;">
+                <div style="border: 1px solid #6f42c1; border-radius: 8px; padding: 12px; display: flex; align-items: flex-start; gap: 12px;">
 
+                    <!-- Buttons column -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button @onclick="() => ToggleFavorite(article)">
+                            <i class="bi @(ArticleOptions.IsFavorite(article) ? "bi-star-fill" : "bi-star")"></i>
+                        </button>
+                        <button @onclick="() => DeleteArticle(article)"><i class="bi bi-trash3"></i></button>
+                    </div>
 
-                <!-- Article content -->
-                <div>
-                    <a href="#" @onclick="() => OpenArticle(article.Url)">
-                        <strong>@article.Title</strong>
-                    </a>
-                    <br />
-                    <em>@article.Author</em><br />
-                    @article.Description
+                    <!-- Article content -->
+                    <div>
+                        <a href="#" @onclick="() => OpenArticle(article.Url)">
+                            <strong>@article.Title</strong>
+                        </a>
+                        <br />
+                        <em>@article.Author</em><br />
+                        @article.Description
+                    </div>
                 </div>
             </li>
         }
@@ -40,5 +47,14 @@ else
 }
 
 @code {
+    private async Task ToggleFavorite(Article article)
+    {
+        await ArticleOptions.ToggleFavoriteAsync(article, StateHasChanged);
+    }
+
+    private async Task DeleteArticle(Article article)
+    {
+        await ArticleOptions.DeleteArticleAsync(article, articles, StateHasChanged);
+    }
 
 }
