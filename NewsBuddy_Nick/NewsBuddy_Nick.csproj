@@ -67,8 +67,4 @@
         <PackageReference Include="NewsAPI" Version="0.7.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Components\CodeForPages\" />
-    </ItemGroup>
-
 </Project>

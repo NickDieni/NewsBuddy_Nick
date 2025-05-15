@@ -1,7 +1,9 @@
 ﻿@page "/favorite"
 @using NewsAPI.Models
 @using System.Text.Json
+@using NewsBuddy_Nick.Helpers
 @inject IJSRuntime JS
+@inherits NewsBuddy_Nick.Pages.Favorite
 
 <h1>Favorite Articles</h1>
 
@@ -18,41 +20,25 @@ else
     <ul>
         @foreach (var article in favorites)
         {
-            <li>
-                <a href="#" @onclick="() => OpenArticle(article.Url)">
-                    <strong>@article.Title</strong>
-                </a>
-                <br />
-                <em>@article.Author</em><br />
-                @article.Description
+            <li style="display: flex; align-items: center; margin-bottom: 12px; ">
+                <!-- Options button -->
+                <button @onclick="async () => await ShowOptions(article)">☰</button>
+
+
+                <!-- Article content -->
+                <div>
+                    <a href="#" @onclick="() => OpenArticle(article.Url)">
+                        <strong>@article.Title</strong>
+                    </a>
+                    <br />
+                    <em>@article.Author</em><br />
+                    @article.Description
+                </div>
             </li>
         }
     </ul>
 }
 
 @code {
-    private List<Article>? favorites;
 
-    protected override void OnInitialized()
-    {
-        LoadFavorites();
-    }
-
-    private void LoadFavorites()
-    {
-        string json = Preferences.Get("favorite_articles", "[]");
-        favorites = JsonSerializer.Deserialize<List<Article>>(json) ?? new();
-    }
-
-    private async Task OpenArticle(string url)
-    {
-        try
-        {
-            await Launcher.Default.OpenAsync(url);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Could not open URL: {ex.Message}");
-        }
-    }
 }

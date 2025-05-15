@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using NewsAPI.Models;
 using NewsBuddy_Nick.APIStuff.Models;
+using NewsBuddy_Nick.Helpers;
 using NewsBuddy_Nick.Services;
 using System.Text.Json;
 
@@ -61,37 +62,10 @@ public partial class Home : ComponentBase
     }
     protected async Task ShowOptions(Article article)
     {
-        string action = await App.Current.Windows[0].Page.DisplayActionSheet(
-            "Options", "Cancel", null, "Favorite", "Delete");
-
-        if (action == "Favorite")
-        {
-            SaveFavorite(article);
-        }
-        else if (action == "Delete")
-        {
-            articles?.Remove(article);
-            StateHasChanged();
-        }
+        await ArticleOptions.ShowOptionsAsync(article, articles!, StateHasChanged);
     }
-    protected void SaveFavorite(Article article)
-    {
-        var json = Preferences.Get("favorite_articles", "[]");
-        var list = JsonSerializer.Deserialize<List<FavoriteArticle>>(json) ?? new();
 
-        if (!list.Any(a => a.Url == article.Url))
-        {
-            list.Add(new FavoriteArticle
-            {
-                Title = article.Title,
-                Author = article.Author,
-                Description = article.Description,
-                Url = article.Url
-            });
 
-            Preferences.Set("favorite_articles", JsonSerializer.Serialize(list));
-        }
-    }
 
 
 

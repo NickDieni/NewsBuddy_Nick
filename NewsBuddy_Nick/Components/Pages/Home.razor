@@ -5,28 +5,32 @@
 
 @if (articles == null)
 {
-        <p>Loading news...</p>
+    <p>Loading news...</p>
 }
 else if (!articles.Any())
 {
-        <p>No news available.</p>
+    <p>No news available.</p>
 }
 else
 {
-        <ul>
+    <ul>
         @foreach (var article in articles)
         {
-            var id = $"article_{article.Title.GetHashCode()}";
-            <li id="@id">
-                <button @onclick="() => SaveFavorite(article)">⭐</button>
+            <li style="display: flex; align-items: center; margin-bottom: 12px;">
+                <!-- Options button -->
+                <button @onclick="async () => await ShowOptions(article)">☰</button>
 
-                <a href="#" @onclick="() => OpenArticle(article.Url)">
-                    <strong>@article.Title</strong>
-                </a>
-                <br />
-                <em>@article.Author</em><br />
-                @article.Description
+
+                <!-- Article content -->
+                <div>
+                    <a href="#" @onclick="() => OpenArticle(article.Url)">
+                        <strong>@article.Title</strong>
+                    </a>
+                    <br />
+                    <em>@article.Author</em><br />
+                    @article.Description
+                </div>
             </li>
         }
-        </ul>
+    </ul>
 }
