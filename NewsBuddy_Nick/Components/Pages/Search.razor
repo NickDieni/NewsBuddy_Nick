@@ -1,7 +1,114 @@
 ﻿@page "/search"
+@using NewsAPI
+@using NewsAPI.Models
+@using NewsAPI.Constants
+@using NewsBuddy_Nick.Helpers
 
-<h3>Search</h3>
+<h3>Search News</h3>
+
+<input @bind="searchTerm" @bind:event="oninput" placeholder="Search for news..." class="form-control mb-3" />
+<button class="btn btn-primary mb-4" @onclick="SearchAsync">Search</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (articles != null && articles.Any())
+{
+    <ul style="  padding: 0; margin: 0 auto; max-width: 600px; width: 100%;">
+        @foreach (var article in articles)
+        {
+            <li style="display: flex; align-items: center; margin-bottom: 12px;">
+                <div style="border: 1px solid #6f42c1; border-radius: 8px; padding: 12px; display: flex; align-items: flex-start; gap: 12px;">
+
+                    <!-- Buttons column -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button @onclick="() => ToggleFavorite(article)">
+                            <i class="bi @(ArticleOptions.IsFavorite(article) ? "bi-star-fill" : "bi-star")"></i>
+                        </button>
+                        <button @onclick="() => DeleteArticle(article)"><i class="bi bi-trash3"></i></button>
+                    </div>
+
+                    <!-- Article content -->
+                    <div>
+                        <a href="#" @onclick="() => OpenArticle(article.Url)">
+                            <strong>@article.Title</strong>
+                        </a>
+                        <br />
+                        <em>@article.Author</em><br />
+                        @article.Description
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else if (hasSearched)
+{
+    <p>No results found for "@searchTerm".</p>
+}
 
 @code {
+    private string searchTerm = string.Empty;
+    private List<Article>? articles;
+    private bool isLoading = false;
+    private bool hasSearched = false;
+    private async Task ToggleFavorite(Article article)
+    {
+        await ArticleOptions.ToggleFavoriteAsync(article, StateHasChanged);
+    }
 
+    private async Task DeleteArticle(Article article)
+    {
+        await ArticleOptions.DeleteArticleAsync(article, articles, StateHasChanged);
+    }
+
+    private async Task SearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return;
+
+        isLoading = true;
+        hasSearched = true;
+
+        try
+        {
+            var newsApiClient = new NewsApiClient("dada209737d6415398a1963568ec724a");
+
+            var response = await newsApiClient.GetEverythingAsync(new EverythingRequest
+                {
+                    Q = searchTerm,
+                    Language = Languages.DA,
+                    SortBy = SortBys.Relevancy,
+                    PageSize = 20
+                });
+
+            if (response.Status == Statuses.Ok)
+            {
+                articles = response.Articles;
+            }
+            else
+            {
+                articles = new List<Article>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Search error: {ex.Message}");
+        }
+
+        isLoading = false;
+    }
+
+    private async Task OpenArticle(string url)
+    {
+        try
+        {
+            await Launcher.Default.OpenAsync(url);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not open URL: {ex.Message}");
+        }
+    }
 }
