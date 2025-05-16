@@ -1,0 +1,76 @@
+﻿@page "/notification-settings"
+@inject NewsBuddy_Nick.APIStuff.Service.NewsPollingService PollingService
+@using NewsBuddy_Nick.APIStuff.Service
+
+
+<h1 class="centered-header">Notification Settings</h1>
+
+<label>
+    Search Keyword:
+    <input type="text" @bind="keyword" placeholder="Enter keyword" />
+</label>
+
+<br />
+<br />
+
+<label>
+    <input type="checkbox" @bind="notificationsEnabled" />
+    Enable Notifications
+</label>
+
+<br />
+<br />
+
+<div class="button-container">
+    <button class="save-button" @onclick="SaveSettings">
+        Save Settings
+    </button>
+</div>
+
+
+<div class="button-container">
+    <p>
+        @statusMessage
+    </p>
+</div>
+@code {
+    private string keyword = "news"; // default or load from storage
+    private bool notificationsEnabled = false;
+    private string statusMessage = "";
+
+
+
+    protected override void OnInitialized()
+    {
+        // Optionally load saved settings from Preferences or your storage
+        keyword = Preferences.Get("notification_keyword", "news");
+        notificationsEnabled = Preferences.Get("notifications_enabled", false);
+
+        // Update the polling service
+        PollingService.SetKeyword(keyword);
+
+        if (notificationsEnabled)
+            PollingService.Start();
+        else
+            PollingService.Stop();
+    }
+    private async Task SaveSettings()
+    {
+        Preferences.Set("notification_keyword", keyword);
+        Preferences.Set("notifications_enabled", notificationsEnabled);
+
+        PollingService.SetKeyword(keyword);
+
+        if (notificationsEnabled)
+            PollingService.Start();
+        else
+            PollingService.Stop();
+
+        statusMessage = "Settings saved!";
+
+        // To update the UI after changing statusMessage
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+}

@@ -30,4 +30,22 @@ public class NewsService
             return result.Status == Statuses.Ok ? result.Articles : new List<Article>();
         });
     }
+
+    public async Task<List<Article>> GetLatestNewsWithKeywordAsync(string keyword)
+    {
+        var request = new EverythingRequest
+        {
+            Q = keyword,
+            SortBy = SortBys.PublishedAt,
+            Language = Languages.DA,
+            From = DateTime.Today.AddDays(-1) // Last 24 hours
+        };
+
+        return await Task.Run(() =>
+        {
+            var result = _newsApiClient.GetEverything(request);
+            return result.Status == Statuses.Ok ? result.Articles : new List<Article>();
+        });
+    }
+
 }

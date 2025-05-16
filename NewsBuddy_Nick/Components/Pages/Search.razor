@@ -4,7 +4,7 @@
 @using NewsAPI.Constants
 @using NewsBuddy_Nick.Helpers
 
-<h3>Search News</h3>
+<h1 class="centered-header">Search News</h1>
 
 <input @bind="searchTerm" @bind:event="oninput" placeholder="Search for news..." class="form-control mb-3" />
 <button class="btn btn-primary mb-4" @onclick="SearchAsync">Search</button>

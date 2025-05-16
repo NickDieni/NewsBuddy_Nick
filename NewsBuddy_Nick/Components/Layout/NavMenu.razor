@@ -2,33 +2,43 @@
 
 <div class="top-row navbar navbar-dark ps-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">News Buddy</a>
+        <a class="navbar-brand" href="">
+            <img src="images/newsbuddy_icon.png" alt="News Buddy Icon" style="height: 34px; width: 34px; margin-right: 8px;" />
+
+            News Buddy
+        </a>
+
     </div>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+    <ul class="sidebar-menu">
+        <li class="menu-item">
+            <NavLink class="nav-link" href="">
+                <i class="bi bi-house-door-fill"></i>
+                Home
             </NavLink>
-        </div>
-        <div class="nav-item px-3">
+        </li>
+        <li class="menu-item">
             <NavLink class="nav-link" href="search">
-                <span class="bi bi-search" aria-hidden="true"></span> Search
+                <i class="bi bi-search"></i>
+                Search
             </NavLink>
-        </div>
-        <div class="nav-item px-3">
+        </li>
+        <li class="menu-item">
             <NavLink class="nav-link" href="favorite">
-                <span class="bi bi-envelope-heart" aria-hidden="true"></span> Favorite
+                <i class="bi bi-envelope-heart"></i>
+                Favorite
             </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+        </li>
+        <li class="menu-item">
+            <NavLink class="nav-link" href="notification-settings">
+                <i class="bi bi-bell"></i>
+                Notifications
             </NavLink>
-        </div>
-    </nav>
+        </li>
+    </ul>
+
 </div>
